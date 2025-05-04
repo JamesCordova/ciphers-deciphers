@@ -108,31 +108,33 @@ class VariablesController:
         
         # Validar parámetros básicos
         if not input_text:
-            return self.set_notification("El texto de entrada no puede estar vacío.", "error")
+            self.set_notification("El texto de entrada no puede estar vacío.", "error")
+            return None
         
         if not key:
-            return self.set_notification("La clave no puede estar vacía.", "error")
+            self.set_notification("La clave no puede estar vacía.", "error")
+            return None
 
-        if self.algorithm_selected == "Transformación Columnar Doble" and " " not in key:
-            return self.set_notification("Para cifrado columnar doble, la clave debe ser dos palabras separadas por espacio.", "error")
-        
         try:
             # Intentar cifrar el texto
             cipher_function = self.cipher_dict.get(self.algorithm_selected)
             if cipher_function is None:
-                return self.algorithm_not_defined(input_text, key)
+                self.algorithm_not_defined(input_text, key)
+                return None
                 
             result = cipher_function(input_text, key, self.current_alphabet)
             
             # Verificar si el resultado es un mensaje de error
-            if result and isinstance(result, str) and ("error" in result.lower() or "excepción" in result.lower() or "inválid" in result.lower()):
-                return self.set_notification(result, "error")
+            if result and isinstance(result, Exception):
+                self.set_notification(result, "error")
+                return None
             else:
                 self.set_notification(f"Cifrado {self.algorithm_selected} completado.", "success")
                 return result
                 
         except Exception as e:
-            return self.set_notification(f"Error al cifrar: {str(e)}", "error")
+            self.set_notification(f"Error al cifrar: {str(e)}", "error")
+            return None
         
     def decipher_text(self, input_text, key):
         """Descifra el texto utilizando el algoritmo seleccionado"""
@@ -140,28 +142,30 @@ class VariablesController:
         
         # Validar parámetros básicos
         if not input_text:
-            return self.set_notification("El texto cifrado no puede estar vacío.", "error")
+            self.set_notification("El texto cifrado no puede estar vacío.", "error")
+            return None
         
         if not key:
-            return self.set_notification("La clave no puede estar vacía.", "error")
-            
-        if self.algorithm_selected == "Transformación Columnar Doble" and " " not in key:
-            return self.set_notification("Para cifrado columnar doble, la clave debe ser dos palabras separadas por espacio.", "error")
+            self.set_notification("La clave no puede estar vacía.", "error")
+            return None
 
         try:
             # Intentar descifrar el texto
             decipher_function = self.decipher_dict.get(self.algorithm_selected)
             if decipher_function is None:
-                return self.algorithm_not_defined(input_text, key)
+                self.algorithm_not_defined(input_text, key)
+                return None
                 
             result = decipher_function(input_text, key, self.current_alphabet)
             
             # Verificar si el resultado es un mensaje de error
-            if result and isinstance(result, str) and ("error" in result.lower() or "excepción" in result.lower() or "inválid" in result.lower()):
-                return self.set_notification(result, "error")
+            if result and isinstance(result, Exception):
+                self.set_notification(result, "error")
+                return None
             else:
-                self.set_notification(f"Descifrado completado con éxito usando {self.algorithm_selected}.", "success")
+                self.set_notification(f"Descifrado {self.algorithm_selected} completado.", "success")
                 return result
                 
         except Exception as e:
-            return self.set_notification(f"Error al descifrar: {str(e)}", "error")
+            self.set_notification(f"Error al descifrar: {str(e)}", "error")
+            return None

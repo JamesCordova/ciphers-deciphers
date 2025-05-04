@@ -156,7 +156,7 @@ class InputOutputFrame(ctk.CTkFrame):
             self.show_notification(notification, notification_type)
         
         # Si hay un resultado y no es un mensaje de error, mostrarlo en el textbox de salida
-        if result and not isinstance(result, str) or "error" not in result.lower():
+        if result is not None:
             self.output_textbox.delete("1.0", "end")
             self.output_textbox.insert("1.0", result)
     
@@ -177,7 +177,7 @@ class InputOutputFrame(ctk.CTkFrame):
             self.show_notification(notification, notification_type)
         
         # Si hay un resultado y no es un mensaje de error, mostrarlo en el textbox de entrada
-        if result and not isinstance(result, str) or "error" not in result.lower():
+        if result is not None:
             self.input_textbox.delete("1.0", "end")
             self.input_textbox.insert("1.0", result)
     

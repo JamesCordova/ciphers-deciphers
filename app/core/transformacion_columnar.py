@@ -310,7 +310,7 @@ def cifrar_transformacion_columnar_simple(mensaje: str, clave: str, alfabeto: st
         cifrador = CifradoColumnarSimple(clave, alfabeto)
         return cifrador.cifrar(mensaje, rellenar)
     except Exception as e:
-        return str(e)
+        return e
 
 def descifrar_transformacion_columnar_simple(mensaje: str, clave: str, alfabeto: str = Alfabetos.ALFABETO_INGLES):
     """
@@ -331,7 +331,7 @@ def descifrar_transformacion_columnar_simple(mensaje: str, clave: str, alfabeto:
         cifrador = CifradoColumnarSimple(clave, alfabeto)
         return cifrador.descifrar(mensaje)
     except Exception as e:
-        return str(e)
+        return e
 
 def cifrar_transformacion_columnar_doble(mensaje: str, clave: str, alfabeto: str = Alfabetos.ALFABETO_INGLES, rellenar: bool = True):
     """
@@ -350,6 +350,9 @@ def cifrar_transformacion_columnar_doble(mensaje: str, clave: str, alfabeto: str
     Raises:
         ValueError: Si hay errores en los parámetros
     """
+    if " " not in clave:
+        return "La clave para cifrado columnar doble debe contener dos palabras separadas por un espacio."
+
     try:
         # Dividir la clave en dos partes
         partes_clave = clave.split()
@@ -360,7 +363,7 @@ def cifrar_transformacion_columnar_doble(mensaje: str, clave: str, alfabeto: str
         cifrador = CifradoColumnarDoble(clave1, clave2, alfabeto)
         return cifrador.cifrar(mensaje, rellenar)
     except Exception as e:
-        return str(e)
+        return e
 
 def descifrar_transformacion_columnar_doble(mensaje: str, clave: str, alfabeto: str = Alfabetos.ALFABETO_INGLES, rellenar: bool = True):
     """
@@ -379,14 +382,18 @@ def descifrar_transformacion_columnar_doble(mensaje: str, clave: str, alfabeto: 
     Raises:
         ValueError: Si hay errores en los parámetros
     """
+    if " " not in clave:
+        return "La clave para cifrado columnar doble debe contener dos palabras separadas por un espacio."
+        
     try:
         # Dividir la clave en dos partes
         partes_clave = clave.split()
         if len(partes_clave) != 2:
             raise ValueError("La clave para cifrado columnar doble debe contener dos palabras separadas por un espacio")
-            
+        
         clave1, clave2 = partes_clave
         cifrador = CifradoColumnarDoble(clave1, clave2, alfabeto)
-        return cifrador.descifrar(mensaje, rellenar)
+        result = cifrador.descifrar(mensaje, rellenar)
+        return result
     except Exception as e:
-        return str(e)
+        return e
