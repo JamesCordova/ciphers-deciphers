@@ -7,10 +7,16 @@ class HeaderFrame(ctk.CTkFrame):
         self.list = list_choices
         self.selected = selected
         # Create a title_label
-        self.title_label = ctk.CTkLabel(self, text=self.selected[0], wraplength=570, anchor="w")
+        self.title_label = ctk.CTkLabel(self, text=self.selected[0], wraplength=650, anchor="w", font=("Arial", 25))
         self.title_label.place(relx=0.02, rely=0.5, relwidth=0.75, anchor="w")
         # Create a Combobox
-        self.combobox = ctk.CTkComboBox(self, values=list_choices, command=self.on_combobox_change, variable=self.selected, state="readonly")
+        self.combobox = ctk.CTkComboBox(self, 
+                                        values=list_choices, 
+                                        corner_radius=15,
+                                        border_color=(cf.MESSAGE_COLOR_LIGHT,cf.MESSAGE_COLOR_DARK),
+                                        command=self.on_combobox_change, 
+                                        variable=self.selected, 
+                                        state="readonly")
         self.combobox.set(self.selected[0])
         self.combobox.place(relx=0.78, rely=0.5, relwidth=0.21, anchor="w")
         
@@ -77,3 +83,29 @@ class InputOutputFrame(ctk.CTkFrame):
     def decypher_content(self):
         print("Decypher button clicked")
         pass
+    
+class AlphabetFrame(ctk.CTkFrame):
+    def __init__(self, master=None, **kwargs):
+        super().__init__(master, **kwargs)
+        # Create a label for the alphabet
+        self.alphabet_label = ctk.CTkLabel(self, text="Alphabet", fg_color=(cf.BG_COLOR_LIGHT, cf.BG_COLOR_DARK))
+        self.alphabet_label.pack(side="top", fill="x")
+        # Create a segmented button for the alphabet options
+        self.alphabet_options = ctk.CTkSegmentedButton(self, 
+                                                       values=["Option 1", "Option 2", "Option 3"], 
+                                                       corner_radius=20,
+                                                       bg_color=(cf.BG_COLOR_LIGHT, cf.BG_COLOR_DARK),
+                                                       fg_color=(cf.BG_COLOR_LIGHT, cf.BG_COLOR_DARK),
+                                                       selected_color=(cf.SUCCESS_COLOR_LIGHT, cf.SUCCESS_COLOR_DARK),
+                                                       selected_hover_color=(cf.SUCCESS_COLOR_LIGHT, cf.SUCCESS_COLOR_DARK),
+                                                       command=self.on_segmented_button_change)
+        self.alphabet_options.pack(side="top", fill="x")
+        # Create a label for the current alphabet
+        self.current_alphabet_entry = ctk.CTkEntry(self, placeholder_text="Current Alphabet", corner_radius=0, fg_color=(cf.BG_COLOR_LIGHT, cf.BG_COLOR_DARK), border_color=cf.ERROR_COLOR_DARK, border_width=1)
+        self.current_alphabet_entry.pack(side="top", fill="x", anchor="n", expand=True)
+        
+    def on_segmented_button_change(self, value):
+        print("Segmented button changed to:", value)
+        # Update the current alphabet entry with the selected value
+        self.current_alphabet_entry.delete(0, ctk.END)
+        self.current_alphabet_entry.insert(0, value)
