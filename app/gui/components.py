@@ -60,21 +60,35 @@ class InputOutputFrame(ctk.CTkFrame):
         
         
         # Operation side: the frame will have a button and a entry box for the key
-        self.key_entry = ctk.CTkEntry(self.operation_side,placeholder_text="Clave", corner_radius=20, fg_color=(cf.BG_COLOR_LIGHT, cf.BG_COLOR_DARK))
+        self.key_entry = ctk.CTkEntry(self.operation_side, placeholder_text="Clave", corner_radius=20, fg_color=(cf.BG_COLOR_LIGHT, cf.BG_COLOR_DARK))
         self.key_entry.pack(side="top", fill="x", anchor="center", expand=True, padx=15, pady=10)
+        
         # two buttons for the cypher and decypher
         self.cypher_button = ctk.CTkButton(self.operation_side, 
-                                           text="Cypher >", 
+                                           text="Cifrar >", 
                                            corner_radius = 15,
                                             fg_color = (cf.MESSAGE_COLOR_LIGHT, cf.MESSAGE_COLOR_DARK),
                                             hover_color = (cf.SUCCESS_COLOR_LIGHT, cf.SUCCESS_COLOR_DARK), command=self.cypher_content)
         self.cypher_button.pack(side="top", fill="x", anchor="center", expand=True, padx=15, pady=10)
+        
         self.decypher_button = ctk.CTkButton(self.operation_side, 
-                                             text="< Decypher", 
+                                             text="< Descifrar", 
                                              corner_radius = 15,
                                              fg_color = (cf.MESSAGE_COLOR_LIGHT, cf.MESSAGE_COLOR_DARK),
                                              hover_color = (cf.SUCCESS_COLOR_LIGHT, cf.SUCCESS_COLOR_DARK), command=self.decypher_content)
         self.decypher_button.pack(side="top", fill="x", anchor="center", expand=True, padx=15, pady=10)
+        
+        # Label de notificación para mostrar mensajes de éxito o error
+        # Por defecto está vacío y no afecta al layout
+        self.notification_label = ctk.CTkLabel(self.master, 
+                                             text="", 
+                                             wraplength=150,  # Para que el texto se ajuste al ancho
+                                             corner_radius=15,
+                                             anchor="center",
+                                             justify="center",
+                                             font=("Arial", 12),
+                                             fg_color=(cf.BG_COLOR_LIGHT, cf.BG_COLOR_DARK))
+        self.notification_label.place(relx=0.5, rely=0.65, anchor="center", relwidth=0.15, relheight=0.1)
         
     
         # Output side: the label and the textbox for the input text
@@ -92,38 +106,80 @@ class InputOutputFrame(ctk.CTkFrame):
         self.grid_columnconfigure(2, weight=5)
         self.grid_rowconfigure(0, weight=1)
         
+    def show_notification(self, message, type="success"):
+        """
+        Muestra un mensaje de notificación en el label de notificaciones.
+        El tipo puede ser "success", "error" o "info" para cambiar el color de fondo.
+        """
+        # Limpiar cualquier notificación anterior
+        self.notification_label.configure(text=message)
+        
+        # Configurar color según el tipo de notificación
+        if type == "success":
+            self.notification_label.configure(
+                fg_color=(cf.SUCCESS_COLOR_LIGHT, cf.SUCCESS_COLOR_DARK),
+                text_color=("black", "white"))
+        elif type == "error":
+            self.notification_label.configure(
+                fg_color=(cf.ERROR_COLOR_LIGHT, cf.ERROR_COLOR_DARK),
+                text_color=("black", "white"))
+        else:  # info
+            self.notification_label.configure(
+                fg_color=(cf.MESSAGE_COLOR_LIGHT, cf.MESSAGE_COLOR_DARK),
+                text_color=("black", "white"))
+        
+        # Asegurar que la notificación sea visible
+        self.notification_label.lift()
+        
+        # Programar la eliminación automática del mensaje después de 5 segundos
+        self.after(5000, self.clear_notification)
+        
+    def clear_notification(self):
+        """Elimina el mensaje de notificación"""
+        self.notification_label.configure(text="", fg_color=(cf.BG_COLOR_LIGHT, cf.BG_COLOR_DARK))
+        self.controller.clear_notification()
+        
     def cypher_content(self):
         print("Cypher button clicked")
         input_text = self.input_textbox.get("1.0", "end-1c")
         key = self.key_entry.get()
         
-        if not input_text:
-            print("No input text provided")
-            # Notifications or error handling can be added here
-            return
-            
-        # Using controller to cipher the text
+        # Limpiar notificaciones anteriores
+        self.clear_notification()
+        
+        # Usando controlador para cifrar el texto
         result = self.controller.cipher_text(input_text, key)
         
-        # Show the result in the output textbox
-        self.output_textbox.delete("1.0", "end")
-        self.output_textbox.insert("1.0", result)
+        # Obtener y mostrar notificación si existe
+        notification, notification_type = self.controller.get_last_notification()
+        if notification:
+            self.show_notification(notification, notification_type)
+        
+        # Si hay un resultado y no es un mensaje de error, mostrarlo en el textbox de salida
+        if result and not isinstance(result, str) or "error" not in result.lower():
+            self.output_textbox.delete("1.0", "end")
+            self.output_textbox.insert("1.0", result)
     
     def decypher_content(self):
         print("Decypher button clicked")
         input_text = self.output_textbox.get("1.0", "end-1c")
         key = self.key_entry.get()
         
-        if not input_text:
-            print("No input text provided")
-            return
-            
-        # Using controller to decipher the text
+        # Limpiar notificaciones anteriores
+        self.clear_notification()
+        
+        # Usando controlador para descifrar el texto
         result = self.controller.decipher_text(input_text, key)
         
-        # Show the result in the input textbox
-        self.input_textbox.delete("1.0", "end")
-        self.input_textbox.insert("1.0", result)
+        # Obtener y mostrar notificación si existe
+        notification, notification_type = self.controller.get_last_notification()
+        if notification:
+            self.show_notification(notification, notification_type)
+        
+        # Si hay un resultado y no es un mensaje de error, mostrarlo en el textbox de entrada
+        if result and not isinstance(result, str) or "error" not in result.lower():
+            self.input_textbox.delete("1.0", "end")
+            self.input_textbox.insert("1.0", result)
     
 class AlphabetFrame(ctk.CTkFrame):
     def __init__(self, master=None, controller=None, **kwargs):
