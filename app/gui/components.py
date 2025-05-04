@@ -9,7 +9,7 @@ class HeaderFrame(ctk.CTkFrame):
             raise ValueError("Controller needed")
         self.controller = controller
         # Create a title_label
-        self.title_label = ctk.CTkLabel(self, text=self.controller.get_selected_algorithm, wraplength=650, anchor="w", font=("Arial", 25))
+        self.title_label = ctk.CTkLabel(self, text=self.controller.get_selected_algorithm(), wraplength=650, anchor="w", font=("Arial", 25))
         self.title_label.place(relx=0.02, rely=0.5, relwidth=0.75, anchor="w")
         # Create a Combobox
         self.combobox = ctk.CTkComboBox(self, 
@@ -23,7 +23,7 @@ class HeaderFrame(ctk.CTkFrame):
         
     def on_combobox_change(self, choice):
         # Update the title_label text with the selected choice
-        print(f"Combobox changed to: {choice}")
+        # print(f"Combobox changed to: {choice}")
         self.controller.set_algorithm(choice)
         self.title_label.configure(text=choice)
 
@@ -99,12 +99,13 @@ class InputOutputFrame(ctk.CTkFrame):
         
         if not input_text:
             print("No input text provided")
+            # Notifications or error handling can be added here
             return
             
-        # Usar el controlador para cifrar el texto
+        # Using controller to cipher the text
         result = self.controller.cipher_text(input_text, key)
         
-        # Mostrar el resultado en el cuadro de texto de salida
+        # Show the result in the output textbox
         self.output_textbox.delete("1.0", "end")
         self.output_textbox.insert("1.0", result)
     
@@ -117,10 +118,10 @@ class InputOutputFrame(ctk.CTkFrame):
             print("No input text provided")
             return
             
-        # Usar el controlador para descifrar el texto
+        # Using controller to decipher the text
         result = self.controller.decipher_text(input_text, key)
         
-        # Mostrar el resultado en el cuadro de texto de entrada
+        # Show the result in the input textbox
         self.input_textbox.delete("1.0", "end")
         self.input_textbox.insert("1.0", result)
     
@@ -154,21 +155,19 @@ class AlphabetFrame(ctk.CTkFrame):
         self.current_alphabet_entry.pack(side="top", fill="x", anchor="n", expand=True, padx=20, pady=2)
         
     def on_segmented_button_change(self, value):
-        print("Segmented button changed to:", value)
-        # Actualizar el alfabeto seleccionado en el controlador
+        # print("Segmented button changed to:", value)
+        # Update the controller with the selected alphabet
         self.controller.set_alphabet(value)
-        
+        # Update the current alphabet entry with the selected value
+        self.current_alphabet_entry.configure(state="normal")
+        self.current_alphabet_entry.delete(0, ctk.END)
+        self.current_alphabet_entry.insert(0, self.controller.get_current_alphabet())
         # Si se selecciona Custom, permitir editar el abecedario
         if value == "Custom":
-            self.current_alphabet_entry.configure(state="normal")
-            self.current_alphabet_entry.delete(0, ctk.END)
-            self.current_alphabet_entry.insert(0, self.controller.get_current_alphabet())
             self.current_alphabet_entry.bind("<FocusOut>", self.update_custom_alphabet)
         else:
-            # Si no es Custom, mostrar el abecedario predefinido
-            self.current_alphabet_entry.configure(state="readonly")
-            self.current_alphabet_entry.delete(0, ctk.END)
-            self.current_alphabet_entry.insert(0, self.controller.get_current_alphabet())
+            # Para otros abecedarios predefinidos, actualizar el campo pero mantenerlo como solo lectura
+            self.current_alphabet_entry.configure(state="readonly")  # Volver a readonly después de la edición
     
     def update_custom_alphabet(self, event=None):
         """Actualiza el abecedario personalizado en el controlador cuando el usuario termina de editarlo"""
