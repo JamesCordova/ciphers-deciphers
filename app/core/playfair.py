@@ -1,5 +1,5 @@
 
-def cifrar_playfair(texto, clave):
+def cifrar_playfair(texto, clave, alphabet=None):
     """
     Cifra un texto utilizando el método de Playfair.
     
@@ -23,7 +23,7 @@ def cifrar_playfair(texto, clave):
     
     return texto_cifrado
 
-def descifrar_playfair(texto_cifrado, clave):
+def descifrar_playfair(texto_cifrado, clave, alphabet=None):
     """
     Descifra un texto cifrado utilizando el método de Playfair.
     
@@ -85,3 +85,59 @@ def preparar_texto(texto):
     texto = texto.replace('J', 'I')
     
     return texto
+
+def cifrar_par(par, matriz):
+    """
+    Cifra un par de letras utilizando la matriz de Playfair.
+    
+    :param par: Par de letras a cifrar.
+    :param matriz: Matriz de Playfair.
+    :return: Par cifrado.
+    """
+    fila1, col1 = encontrar_posicion(par[0], matriz)
+    fila2, col2 = encontrar_posicion(par[1], matriz)
+    
+    if fila1 == fila2:
+        # Mismo fila
+        return matriz[fila1][(col1 + 1) % 5] + matriz[fila2][(col2 + 1) % 5]
+    elif col1 == col2:
+        # Misma columna
+        return matriz[(fila1 + 1) % 5][col1] + matriz[(fila2 + 1) % 5][col2]
+    else:
+        # Diferente fila y columna
+        return matriz[fila1][col2] + matriz[fila2][col1]
+
+def descifrar_par(par, matriz):
+    """
+    Descifra un par de letras utilizando la matriz de Playfair.
+    
+    :param par: Par de letras a descifrar.
+    :param matriz: Matriz de Playfair.
+    :return: Par descifrado.
+    """
+    fila1, col1 = encontrar_posicion(par[0], matriz)
+    fila2, col2 = encontrar_posicion(par[1], matriz)
+    
+    if fila1 == fila2:
+        # Mismo fila
+        return matriz[fila1][(col1 - 1) % 5] + matriz[fila2][(col2 - 1) % 5]
+    elif col1 == col2:
+        # Misma columna
+        return matriz[(fila1 - 1) % 5][col1] + matriz[(fila2 - 1) % 5][col2]
+    else:
+        # Diferente fila y columna
+        return matriz[fila1][col2] + matriz[fila2][col1]
+    
+def encontrar_posicion(letra, matriz):
+    """
+    Encuentra la posición de una letra en la matriz de Playfair.
+    
+    :param letra: Letra a buscar.
+    :param matriz: Matriz de Playfair.
+    :return: Fila y columna de la letra en la matriz.
+    """
+    for i in range(5):
+        for j in range(5):
+            if matriz[i][j] == letra:
+                return i, j
+    return None, None  # Si no se encuentra la letra

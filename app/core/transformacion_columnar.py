@@ -1,5 +1,5 @@
 
-def cifrar_transformacion_columnar_simple(texto, clave):
+def cifrar_transformacion_columnar_simple(texto, clave, alphabet=None):
     """
     Cifra un texto utilizando el método de transformación columnar simple.
     
@@ -34,7 +34,7 @@ def cifrar_transformacion_columnar_simple(texto, clave):
     
     return texto_cifrado
 
-def descifrar_transformacion_columnar_simple(texto_cifrado, clave):
+def descifrar_transformacion_columnar_simple(texto_cifrado, clave, alphabet=None):
     """
     Descifra un texto cifrado utilizando el método de transformación columnar simple.
     
