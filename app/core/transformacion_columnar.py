@@ -135,6 +135,8 @@ class CifradoColumnarSimple:
         Raises:
             ValueError: Si el mensaje cifrado contiene caracteres fuera del alfabeto.
         """
+        # Normalización y limpieza del mensaje
+        mensaje_cifrado = mensaje_cifrado.upper().replace(" ", "")
         # Validación de caracteres del mensaje cifrado
         caracteres_invalidos = [c for c in mensaje_cifrado if c not in self.alfabeto]
         if caracteres_invalidos:
@@ -274,6 +276,8 @@ class CifradoColumnarDoble:
         Returns:
             Mensaje descifrado.
         """
+        # Normalización y limpieza del mensaje
+        mensaje_cifrado = mensaje_cifrado.upper().replace(" ", "")
         # Primero descifrar con el segundo cifrador (orden inverso)
         resultado_intermedio = self.cifrador_segunda_pasada.descifrar(mensaje_cifrado)
 
@@ -350,8 +354,6 @@ def cifrar_transformacion_columnar_doble(mensaje: str, clave: str, alfabeto: str
     Raises:
         ValueError: Si hay errores en los parámetros
     """
-    if " " not in clave:
-        return "La clave para cifrado columnar doble debe contener dos palabras separadas por un espacio."
 
     try:
         # Dividir la clave en dos partes
@@ -382,9 +384,7 @@ def descifrar_transformacion_columnar_doble(mensaje: str, clave: str, alfabeto: 
     Raises:
         ValueError: Si hay errores en los parámetros
     """
-    if " " not in clave:
-        return "La clave para cifrado columnar doble debe contener dos palabras separadas por un espacio."
-        
+     
     try:
         # Dividir la clave en dos partes
         partes_clave = clave.split()
