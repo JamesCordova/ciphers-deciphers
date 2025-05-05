@@ -1,27 +1,74 @@
 def cifrar_playfair(texto, clave, alphabet=None):
     """
     Cifra un texto utilizando el método de Playfair.
+    Función adaptadora para integrarse con el controlador de variables.
     
     :param texto: Texto a cifrar.
     :param clave: Clave de cifrado.
     :param alphabet: Alfabeto a utilizar (no se usa en este algoritmo pero se incluye para compatibilidad).
     :return: Texto cifrado.
     """
-    # Crear la matriz de Playfair
-    matriz = crear_matriz_playfair(clave)
-    
-    # Preparar el texto
-    texto = preparar_texto(texto)
-    
-    # Cifrar el texto
-    texto_cifrado = ''
-    for i in range(0, len(texto), 2):
-        par = texto[i:i+2]
-        if len(par) == 1:
-            par += 'X'  # Agregar 'X' si el par es impar
-        texto_cifrado += cifrar_par(par, matriz)
-    
-    return texto_cifrado
+    try:
+        # Normalizar entrada
+        texto = texto.strip()
+        clave = clave.strip()
+        
+        if not texto:
+            return "El texto a cifrar no puede estar vacío."
+            
+        if not clave:
+            return "La clave no puede estar vacía."
+        
+        # Normalizar el texto y la clave usando la misma función que el descifrado
+        texto_norm = normalizar_palabra(texto)
+        clave_norm = normalizar_palabra(clave)
+        
+        if len(texto_norm) < 1:
+            raise ValueError("El texto a cifrar es demasiado corto o contiene caracteres no válidos.")
+        
+        # Preparar el texto para que tenga longitud par
+        # Si dos letras iguales están juntas, insertar 'x' entre ellas
+        texto_preparado = []
+        i = 0
+        while i < len(texto_norm):
+            if i+1 < len(texto_norm):
+                if texto_norm[i] == texto_norm[i+1]:
+                    texto_preparado.append(texto_norm[i])
+                    texto_preparado.append('x')
+                    i += 1
+                else:
+                    texto_preparado.append(texto_norm[i])
+                    texto_preparado.append(texto_norm[i+1])
+                    i += 2
+            else:
+                texto_preparado.append(texto_norm[i])
+                texto_preparado.append('x')  # Agregar 'x' si queda una letra sola
+                i += 1
+        
+        texto_norm = ''.join(texto_preparado)
+        
+        # Generar matriz usando la función existente
+        matriz = []
+        generar_matriz(clave_norm, matriz)
+        
+        # Cifrar el texto usando una versión adaptada de la lógica de cifrado
+        texto_cifrado = []
+        posiciones = [0] * 4
+        for i in range(0, len(texto_norm), 2):
+            buscar_posiciones(matriz, texto_norm[i], texto_norm[i+1], posiciones)
+            if posiciones[0] == posiciones[2]:  # Misma fila
+                texto_cifrado.append(matriz[posiciones[0]][(posiciones[1] + 1) % 5])
+                texto_cifrado.append(matriz[posiciones[2]][(posiciones[3] + 1) % 5])
+            elif posiciones[1] == posiciones[3]:  # Misma columna
+                texto_cifrado.append(matriz[(posiciones[0] + 1) % 5][posiciones[1]])
+                texto_cifrado.append(matriz[(posiciones[2] + 1) % 5][posiciones[3]])
+            else:  # Forma un rectángulo
+                texto_cifrado.append(matriz[posiciones[0]][posiciones[3]])
+                texto_cifrado.append(matriz[posiciones[2]][posiciones[1]])
+        
+        return ''.join(texto_cifrado).upper()  # Convertir a mayúsculas para consistencia
+    except Exception as e:
+        return e
 
 def crear_matriz_playfair(clave):
     """
@@ -203,10 +250,10 @@ def descifrar_playfair(texto, clave, alphabet=None):
         clave = clave.strip()
         
         if not texto:
-            raise ValueError("El texto cifrado no puede estar vacío.")
+            return "El texto cifrado no puede estar vacío."
             
         if not clave:
-            raise ValueError("La clave no puede estar vacía.")
+            return "La clave no puede estar vacía."
             
         # Usar la función de descifrado existente
         matriz = []
@@ -224,7 +271,7 @@ def descifrar_playfair(texto, clave, alphabet=None):
         
         return resultado.upper()  # Convertir a mayúsculas para consistencia
     except Exception as e:
-        return e  # Convertir la excepción a string
+        return e
 
 if __name__ == "__main__":
     clave = "unsa"
