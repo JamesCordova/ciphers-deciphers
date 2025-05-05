@@ -15,7 +15,7 @@ class VariablesController:
         
         self.cipher_dict = {
             "Transformación Columnar Simple": tc.cifrar_transformacion_columnar_simple,
-            "Transformación Columnar Doble": None, # Placeholder for future implementation
+            "Transformación Columnar Doble": tc.cifrar_transformacion_columnar_doble,
             "Rejillas criptográficas": None,  # Placeholder for future implementation
             "Transposición de filas": None,  # Placeholder for future implementation
             "Permutación por series": None,  # Placeholder for future implementation
@@ -24,7 +24,7 @@ class VariablesController:
         
         self.decipher_dict = {
             "Transformación Columnar Simple": tc.descifrar_transformacion_columnar_simple,
-            "Transformación Columnar Doble": None,  # Placeholder for future implementation
+            "Transformación Columnar Doble": tc.descifrar_transformacion_columnar_doble,
             "Rejillas criptográficas": None,  # Placeholder for future implementation
             "Transposición de filas": None,  # Placeholder for future implementation
             "Permutación por series": None,  # Placeholder for future implementation
@@ -32,25 +32,31 @@ class VariablesController:
         }
         
         self.alphabets = [
-            "Español",
             "Inglés",
+            "Español",
             "Francés",
             "Alemán",
+            "Playfair",
             "Custom"
         ]
         self.alphabet_selected = self.alphabets[0]
         
         # Diccionario de abecedarios por idioma
         self.alphabet_dict = {
-            "Español": "ABCDEFGHIJKLMNÑOPQRSTUVWXYZ",
             "Inglés": "ABCDEFGHIJKLMNOPQRSTUVWXYZ",
+            "Español": "ABCDEFGHIJKLMNÑOPQRSTUVWXYZ",
             "Francés": "ABCDEFGHIJKLMNOPQRSTUVWXYZÀÂÆÇÉÈÊËÎÏÔŒÙÛÜŸ",
             "Alemán": "ABCDEFGHIJKLMNOPQRSTUVWXYZÄÖÜß",
+            "Playfair": "ABCDEFGHIKLMNOPQRSTUVWXYZ",  # 'J' se omite en el cifrado Playfair
             "Custom": ""  # El usuario puede definir este
         }
         
         # Abecedario actual (inicializado con el del idioma por defecto)
         self.current_alphabet = self.alphabet_dict[self.alphabet_selected]
+
+        # Para gestionar los mensajes de notificación
+        self.last_notification = ""
+        self.notification_type = "success"  # "success", "error", "info"
 
     def set_algorithm(self, algorithm):
         if algorithm in self.algorithms:
@@ -78,24 +84,90 @@ class VariablesController:
     def get_selected_alphabet(self):
         return self.alphabet_selected
     
+    def set_notification(self, message, type="success"):
+        """Establece un mensaje de notificación y su tipo (éxito, error o información)."""
+        self.last_notification = message
+        self.notification_type = type
+        return message
+    
+    def get_last_notification(self):
+        """Retorna el último mensaje de notificación y su tipo."""
+        return self.last_notification, self.notification_type
+    
+    def clear_notification(self):
+        """Limpia el mensaje de notificación."""
+        self.last_notification = ""
+        self.notification_type = "success"
+    
     def algorithm_not_defined(self, input_text, key):
         """Método para manejar el caso en que el algoritmo no está definido."""
-        return f'El algoritmo {self.algorithm_selected} no está definido.'
+        message = f'El algoritmo {self.algorithm_selected} no está implementado todavía.'
+        return self.set_notification(message, "error")
         
     def cipher_text(self, input_text, key):
+        """Cifra el texto utilizando el algoritmo seleccionado"""
         print(f"Cifrando texto con algoritmo: {self.algorithm_selected}, clave: {key}")
+        
+        # Validar parámetros básicos
+        if not input_text:
+            self.set_notification("El texto de entrada no puede estar vacío.", "error")
+            return None
+        
+        if not key:
+            self.set_notification("La clave no puede estar vacía.", "error")
+            return None
 
         try:
-            result = self.cipher_dict.get(self.algorithm_selected)(input_text, key, self.current_alphabet)
-        except TypeError:
-            return self.algorithm_not_defined(input_text, key)
-        return result
+            # Intentar cifrar el texto
+            cipher_function = self.cipher_dict.get(self.algorithm_selected)
+            if cipher_function is None:
+                self.algorithm_not_defined(input_text, key)
+                return None
+                
+            result = cipher_function(input_text, key, self.current_alphabet)
+            
+            # Verificar si el resultado es un mensaje de error
+            if result and isinstance(result, Exception):
+                self.set_notification(result, "error")
+                return None
+            else:
+                self.set_notification(f"Cifrado {self.algorithm_selected} completado.", "success")
+                return result
+                
+        except Exception as e:
+            self.set_notification(f"Error al cifrar: {str(e)}", "error")
+            return None
         
     def decipher_text(self, input_text, key):
-        print(f"Cifrando texto con algoritmo: {self.algorithm_selected}, clave: {key}")
+        """Descifra el texto utilizando el algoritmo seleccionado"""
+        print(f"Descifrando texto con algoritmo: {self.algorithm_selected}, clave: {key}")
+        
+        # Validar parámetros básicos
+        if not input_text:
+            self.set_notification("El texto cifrado no puede estar vacío.", "error")
+            return None
+        
+        if not key:
+            self.set_notification("La clave no puede estar vacía.", "error")
+            return None
 
         try:
-            result = self.decipher_dict.get(self.algorithm_selected)(input_text, key, self.current_alphabet)
-        except TypeError:
-            return self.algorithm_not_defined(input_text, key)
-        return result
+            # Intentar descifrar el texto
+            decipher_function = self.decipher_dict.get(self.algorithm_selected)
+            if decipher_function is None:
+                self.algorithm_not_defined(input_text, key)
+                return None
+                
+            result = decipher_function(input_text, key, self.current_alphabet)
+            
+            # Verificar si el resultado es un mensaje de error
+            if result and isinstance(result, Exception):
+                self.set_notification(result, "error")
+                return None
+            else:
+                self.set_notification(f"Descifrado {self.algorithm_selected} completado.", "success")
+                return result
+                
+        except Exception as e:
+            self.set_notification(f"Error al descifrar: {str(e)}", "error")
+            return None
