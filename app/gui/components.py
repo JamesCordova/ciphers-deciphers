@@ -25,6 +25,18 @@ class HeaderFrame(ctk.CTkFrame):
         # Update the title_label text with the selected choice
         # print(f"Combobox changed to: {choice}")
         self.controller.set_algorithm(choice)
+        if choice == "Playfair":
+            self.master.input_output_frame.show_notification("Playfair tiene su propio abecedario", "info")
+            self.master.alphabet_frame.alphabet_options.configure(state="disabled")
+            self.controller.set_alphabet("Playfair")
+            self.master.alphabet_frame.alphabet_options.set(self.controller.get_selected_alphabet())
+            self.master.alphabet_frame.current_alphabet_entry.configure(state="normal")
+            self.master.alphabet_frame.current_alphabet_entry.delete(0, ctk.END)
+            print(self.controller.get_current_alphabet())
+            self.master.alphabet_frame.current_alphabet_entry.insert(0, self.controller.get_current_alphabet())
+            self.master.alphabet_frame.current_alphabet_entry.configure(state="readonly")
+        else:
+            self.master.alphabet_frame.alphabet_options.configure(state="normal")
         self.title_label.configure(text=choice)
 
 class InputOutputFrame(ctk.CTkFrame):

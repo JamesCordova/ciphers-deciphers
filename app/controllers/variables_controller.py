@@ -32,20 +32,22 @@ class VariablesController:
         }
         
         self.alphabets = [
-            "Español",
             "Inglés",
+            "Español",
             "Francés",
             "Alemán",
+            "Playfair",
             "Custom"
         ]
         self.alphabet_selected = self.alphabets[0]
         
         # Diccionario de abecedarios por idioma
         self.alphabet_dict = {
-            "Español": "ABCDEFGHIJKLMNÑOPQRSTUVWXYZ",
             "Inglés": "ABCDEFGHIJKLMNOPQRSTUVWXYZ",
+            "Español": "ABCDEFGHIJKLMNÑOPQRSTUVWXYZ",
             "Francés": "ABCDEFGHIJKLMNOPQRSTUVWXYZÀÂÆÇÉÈÊËÎÏÔŒÙÛÜŸ",
             "Alemán": "ABCDEFGHIJKLMNOPQRSTUVWXYZÄÖÜß",
+            "Playfair": "ABCDEFGHIKLMNOPQRSTUVWXYZ",  # 'J' se omite en el cifrado Playfair
             "Custom": ""  # El usuario puede definir este
         }
         
